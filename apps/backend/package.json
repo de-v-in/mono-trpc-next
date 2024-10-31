@@ -1,0 +1,20 @@
+{
+  "name": "backend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch index.ts",
+    "start": "bun run index.ts"
+  },
+  "dependencies": {
+    "@repo/env": "*",
+    "@repo/orm-entities": "*",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "@types/bun": "latest",
+    "@types/cors": "^2.8.17"
+  }
+}

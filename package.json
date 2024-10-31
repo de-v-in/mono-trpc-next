@@ -1,0 +1,36 @@
+{
+  "name": "mono-template",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.7",
+    "prettier": "^3.2.5",
+    "turbo": "^2.2.3",
+    "typescript": "^5.6.2"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "bun@1.1.33",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "dependencies": {
+    "@saintno/needed-tools": "^0.3.5",
+    "@tanstack/react-query": "^5.59.16",
+    "@trpc/client": "^11.0.0-rc.604",
+    "@trpc/next": "^11.0.0-rc.604",
+    "@trpc/react-query": "^11.0.0-rc.604",
+    "@trpc/server": "^11.0.0-rc.604",
+    "jsonwebtoken": "^9.0.2",
+    "superjson": "^2.2.1",
+    "uuid": "^11.0.2",
+    "zod": "^3.23.8"
+  }
+}
