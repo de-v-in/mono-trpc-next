@@ -1,11 +1,12 @@
-import { MikroORMInstance } from "@/services/mikro-orm";
-import { verify } from "jsonwebtoken";
-import type { CreateNextContextOptions } from "@trpc/server/adapters/next";
-import { User } from "@repo/orm-entities/user";
-import { BackendENV } from "@repo/env";
-import { Logger } from "@saintno/needed-tools";
+import { BackendENV } from '@repo/env';
+import { User } from '@repo/orm-entities/user';
+import { Logger } from '@saintno/needed-tools';
+import type { CreateNextContextOptions } from '@trpc/server/adapters/next';
+import { verify } from 'jsonwebtoken';
 
-const ContextLogger = new Logger("Context");
+import { MikroORMInstance } from '@/services/mikro-orm';
+
+const ContextLogger = new Logger('Context');
 
 /**
  * Creates context for an incoming request
@@ -14,12 +15,11 @@ const ContextLogger = new Logger("Context");
 export const createContext = async (opts: CreateNextContextOptions) => {
   const orm = await MikroORMInstance.getInstance().getORM();
   const headers = opts.req.headers;
-  const rawAuthorization =
-    headers["authorization"] ?? opts.info?.connectionParams?.Authorization;
-  const accessToken = rawAuthorization?.replace("Bearer ", "");
+  const rawAuthorization = headers['authorization'] ?? opts.info?.connectionParams?.Authorization;
+  const accessToken = rawAuthorization?.replace('Bearer ', '');
 
   // Log user request to terminal
-  ContextLogger.i("createContext", opts.req.method || "GET", opts.req.url);
+  ContextLogger.i('createContext', opts.req.method || 'GET', opts.req.url);
 
   const em = orm.em.fork();
   try {
@@ -36,7 +36,7 @@ export const createContext = async (opts: CreateNextContextOptions) => {
       headers,
     };
   } catch (e) {
-    throw new Error("Invalid access token");
+    throw new Error('Invalid access token');
   }
 };
 

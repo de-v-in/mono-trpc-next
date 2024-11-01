@@ -1,7 +1,8 @@
-import { User } from "@repo/orm-entities/user";
-import { BackendENV } from "@repo/env";
-import { MikroORMInstance } from "@/services/mikro-orm";
-import { IncomingMessage, ServerResponse } from "http";
+import { BackendENV } from '@repo/env';
+import { User } from '@repo/orm-entities/user';
+import { IncomingMessage, ServerResponse } from 'http';
+
+import { MikroORMInstance } from '@/services/mikro-orm';
 
 const mikro = MikroORMInstance.getInstance();
 
@@ -18,11 +19,11 @@ export const handleGetUserByCredentials = async (
     return;
   }
 
-  let body = "";
-  req.on("data", (chunk) => {
+  let body = '';
+  req.on('data', (chunk) => {
     body += chunk.toString();
   });
-  req.on("end", async () => {
+  req.on('end', async () => {
     try {
       const { email, password } = JSON.parse(body);
       // Check if email and password are correct
@@ -37,7 +38,7 @@ export const handleGetUserByCredentials = async (
         return;
       }
       // Return the user
-      res.writeHead(200, { "Content-Type": "application/json" });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(user));
     } catch (e) {
       res.writeHead(500);
@@ -59,11 +60,11 @@ export const handleGetUserByEmail = async (
     return;
   }
 
-  let body = "";
-  req.on("data", (chunk) => {
+  let body = '';
+  req.on('data', (chunk) => {
     body += chunk.toString();
   });
-  req.on("end", async () => {
+  req.on('end', async () => {
     try {
       const { email } = JSON.parse(body);
       // Check if email and password are correct
@@ -75,7 +76,7 @@ export const handleGetUserByEmail = async (
         return;
       }
       // Return the user
-      res.writeHead(200, { "Content-Type": "application/json" });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(user));
     } catch (e) {
       res.writeHead(500);

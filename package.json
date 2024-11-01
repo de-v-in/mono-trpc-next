@@ -5,10 +5,13 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
+    "fix-lint": "turbo fix-lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.7",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
     "prettier": "^3.2.5",
     "turbo": "^2.2.3",
     "typescript": "^5.6.2"
@@ -28,6 +31,7 @@
     "@trpc/next": "^11.0.0-rc.604",
     "@trpc/react-query": "^11.0.0-rc.604",
     "@trpc/server": "^11.0.0-rc.604",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
     "jsonwebtoken": "^9.0.2",
     "superjson": "^2.2.1",
     "uuid": "^11.0.2",

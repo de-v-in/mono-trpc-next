@@ -1,5 +1,4 @@
-import superjson from "superjson";
-
+import { BackendENV } from '@repo/env';
 import {
   createWSClient,
   httpBatchLink,
@@ -7,13 +6,13 @@ import {
   isNonJsonSerializable,
   splitLink,
   wsLink,
-} from "@trpc/client";
-import { createTRPCNext } from "@trpc/next";
-import { ssrPrepass } from "@trpc/next/ssrPrepass";
-import type { AppRouter } from "backend/routers/_app";
-import { BackendENV } from "@repo/env";
+} from '@trpc/client';
+import { createTRPCNext } from '@trpc/next';
+import { ssrPrepass } from '@trpc/next/ssrPrepass';
+import type { AppRouter } from 'backend/routers/_app';
+import superjson from 'superjson';
 
-let AuthToken = "";
+let AuthToken = '';
 
 export function setAuthToken(newToken: string) {
   /**
@@ -25,11 +24,11 @@ export function setAuthToken(newToken: string) {
 }
 
 export function getBaseUrl() {
-  if (typeof window !== "undefined") {
+  if (typeof window !== 'undefined') {
     // Get html tag
-    const html = document.querySelector("html");
+    const html = document.querySelector('html');
     // Get data-backend-url attribute
-    const backendURL = html?.getAttribute("data-backend-url");
+    const backendURL = html?.getAttribute('data-backend-url');
     if (backendURL) {
       return backendURL;
     }
@@ -39,10 +38,10 @@ export function getBaseUrl() {
 
 function getBaseWsUrl() {
   const BackendURL = getBaseUrl();
-  if (BackendURL.includes("https")) {
-    return BackendURL.replace("https", "wss");
+  if (BackendURL.includes('https')) {
+    return BackendURL.replace('https', 'wss');
   }
-  return BackendURL.replace("http", "ws");
+  return BackendURL.replace('http', 'ws');
 }
 
 const wsClient = createWSClient({
@@ -58,7 +57,7 @@ const trpc = createTRPCNext<AppRouter>({
   transformer: superjson,
   config(opts) {
     const { ctx } = opts;
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       // during client requests
       return {
         links: [
@@ -67,7 +66,7 @@ const trpc = createTRPCNext<AppRouter>({
           //     process.env.NODE_ENV === 'development' || (opts.direction === 'down' && opts.result instanceof Error)
           // }),
           splitLink({
-            condition: (op) => op.type === "subscription",
+            condition: (op) => op.type === 'subscription',
             true: wsLink({
               client: wsClient,
               transformer: superjson,
@@ -139,4 +138,4 @@ const trpc = createTRPCNext<AppRouter>({
   ssrPrepass,
 });
 
-export { wsClient, trpc };
+export { trpc, wsClient };

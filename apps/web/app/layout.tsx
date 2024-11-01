@@ -1,24 +1,24 @@
-import "./globals.scss";
+import './globals.scss';
 
-import type { Metadata, Viewport } from "next";
+import { BackendENV } from '@repo/env';
+import type { Metadata, Viewport } from 'next';
 
-import { BackendENV } from "@repo/env";
-import TRPCLayout from "./layout.trpc";
+import TRPCLayout from './layout.trpc';
 
 export const viewport: Viewport = {
-  width: "device-width",
+  width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
 };
 
 export const metadata: Metadata = {
-  title: "NextJS + TRPC",
-  description: "A turborepo example with NextJS and TRPC",
+  title: 'NextJS + TRPC',
+  description: 'A turborepo example with NextJS and TRPC',
 };
 
 async function getBackendURL() {
-  "use server";
+  'use server';
   return BackendENV.BACKEND_URL;
 }
 

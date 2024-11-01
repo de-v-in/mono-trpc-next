@@ -1,10 +1,12 @@
-import { z } from "zod";
-import { router } from "../trpc";
-import { User } from "@repo/orm-entities/user";
-import { privateProcedure, publicProcedure } from "@/procedure";
+import { User } from '@repo/orm-entities/user';
+import { z } from 'zod';
+
+import { privateProcedure, publicProcedure } from '@/procedure';
+
+import { router } from '../trpc';
 
 export const userRouter = router({
-  hello: publicProcedure.query(() => "Hello, world!"),
+  hello: publicProcedure.query(() => 'Hello, world!'),
   userUpdate: privateProcedure
     .input(
       z.object({

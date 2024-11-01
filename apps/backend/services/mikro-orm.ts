@@ -1,20 +1,19 @@
-import { MikroORM } from "@mikro-orm/libsql";
-
-import dbConfig from "@repo/orm-entities/mikro-orm.config";
-import { Logger } from "@saintno/needed-tools";
+import { MikroORM } from '@mikro-orm/libsql';
+import dbConfig from '@repo/orm-entities/mikro-orm.config';
+import { Logger } from '@saintno/needed-tools';
 
 export class MikroORMInstance {
   private orm: Promise<MikroORM>;
   private logger: Logger;
 
   private constructor() {
-    this.logger = new Logger("MikroORMInstance");
+    this.logger = new Logger('MikroORMInstance');
     this.orm = MikroORM.init(dbConfig).then(async (orm) => {
       const generator = orm.getSchemaGenerator();
       await generator.updateSchema().catch((e) => {
-        this.logger.i("init", "Schema is updated", e);
+        this.logger.i('init', 'Schema is updated', e);
       });
-      this.logger.i("init", "MikroORM initialized");
+      this.logger.i('init', 'MikroORM initialized');
       return orm;
     });
   }

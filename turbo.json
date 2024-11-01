@@ -10,6 +10,9 @@
     "lint": {
       "dependsOn": ["^lint"]
     },
+    "fix-lint": {
+      "dependsOn": ["^fix-lint"]
+    },
     "dev": {
       "cache": false,
       "persistent": true
