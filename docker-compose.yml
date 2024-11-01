@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  web:
+    # Build the Docker image from the specified context
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile
+    # Map host port 3000 to container port 3000
+    ports:
+      - '3000:3000'
+    # Set environment variables
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - backend
+
+  backend:
+    # Build the Docker image from the specified context
+    build:
+      context: .
+      dockerfile: ./apps/backend/Dockerfile
+    # Map host port 4000 to container port 4000
+    ports:
+      - '3001:3001'
+    # Set environment variables
+    environment:
+      - NODE_ENV=production

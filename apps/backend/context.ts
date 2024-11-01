@@ -1,10 +1,9 @@
+import { MikroORMInstance } from '@backend/services/mikro-orm';
 import { BackendENV } from '@repo/env';
 import { User } from '@repo/orm-entities/user';
 import { Logger } from '@saintno/needed-tools';
 import type { CreateNextContextOptions } from '@trpc/server/adapters/next';
 import { verify } from 'jsonwebtoken';
-
-import { MikroORMInstance } from '@/services/mikro-orm';
 
 const ContextLogger = new Logger('Context');
 

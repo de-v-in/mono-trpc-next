@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "@repo/env": "*",
-    "@mikro-orm/core": "^6.3.13"
+    "@mikro-orm/core": "^6.3.13",
+    "@mikro-orm/libsql": "^6.3.13",
+    "@repo/env": "*"
   },
   "devDependencies": {
     "@repo/typescript-config": "*"

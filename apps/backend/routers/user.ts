@@ -1,7 +1,6 @@
+import { privateProcedure, publicProcedure } from '@backend/procedure';
 import { User } from '@repo/orm-entities/user';
 import { z } from 'zod';
-
-import { privateProcedure, publicProcedure } from '@/procedure';
 
 import { router } from '../trpc';
 

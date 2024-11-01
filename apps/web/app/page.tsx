@@ -1,9 +1,8 @@
 'use client';
 
+import { trpc } from '@frontend/utils/trpc';
 import { Button } from '@repo/ui/button';
 import Image from 'next/image';
-
-import { trpc } from '@/utils/trpc';
 
 import styles from './page.module.css';
 

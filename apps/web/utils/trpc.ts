@@ -1,3 +1,4 @@
+import type { AppRouter } from '@backend/routers/_app';
 import { BackendENV } from '@repo/env';
 import {
   createWSClient,
@@ -9,7 +10,6 @@ import {
 } from '@trpc/client';
 import { createTRPCNext } from '@trpc/next';
 import { ssrPrepass } from '@trpc/next/ssrPrepass';
-import type { AppRouter } from 'backend/routers/_app';
 import superjson from 'superjson';
 
 let AuthToken = '';

@@ -1,9 +1,8 @@
 'use client';
 
+import { trpc } from '@frontend/utils/trpc';
 import type React from 'react';
 import { type PropsWithChildren } from 'react';
-
-import { trpc } from '@/utils/trpc';
 
 const TRPCLayout: React.FC<PropsWithChildren> = ({ children }) => {
   return <>{children}</>;

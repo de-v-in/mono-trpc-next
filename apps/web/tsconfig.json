@@ -9,9 +9,11 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@backend/*": ["../backend/*"],
+      "@frontend/*": ["./*"]
     },
-    "target": "es2017"
+    "target": "es2017",
+    "isolatedModules": true
   },
   "include": [
     "next-env.d.ts",
