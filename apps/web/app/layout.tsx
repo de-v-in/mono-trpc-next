@@ -17,9 +17,12 @@ export const metadata: Metadata = {
   description: 'A turborepo example with NextJS and TRPC',
 };
 
-async function getBackendURL() {
+async function getBackendENV() {
   'use server';
-  return BackendENV.BACKEND_URL;
+  return {
+    sameDomain: BackendENV.BE_SAME_DOMAIN,
+    url: BackendENV.BACKEND_URL,
+  };
 }
 
 export default async function RootLayout({
@@ -29,10 +32,10 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: { locale: string; session: any };
 }>) {
-  const backendURL = await getBackendURL();
+  const beEnv = await getBackendENV();
 
   return (
-    <html lang={locale} data-backend-url={backendURL}>
+    <html lang={locale} data-backend-same-domain={beEnv.sameDomain} data-backend-url={beEnv.url}>
       <body>
         <TRPCLayout>
           <div className="w-full h-full md:p-2 lg:p-4 flex justify-center items-center relative overflow-x-hidden">

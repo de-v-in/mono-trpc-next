@@ -1,30 +1,69 @@
+import { createServer, IncomingMessage, ServerResponse } from 'node:http';
+
+import { MikroORMInstance } from '@backend/services/mikro-orm';
 import { createHTTPHandler } from '@trpc/server/adapters/standalone';
 import { applyWSSHandler } from '@trpc/server/adapters/ws';
 import cors from 'cors';
-import { createServer } from 'http';
 import type { Socket } from 'net';
 import { WebSocketServer } from 'ws';
 
 import { createContext } from './context';
-import { handleGetUserByCredentials, handleGetUserByEmail } from './handlers/user';
+import { ElysiaHandler } from './elysia.route';
 import { appRouter } from './routers/_app';
+import { createPrefixedHandler } from './utils/handler';
+import { convertIMessToRequest } from './utils/request';
 
-const handler = createHTTPHandler({
+/**
+ * Initialize all services
+ */
+MikroORMInstance.getInstance();
+
+export const tRPCHandler = createHTTPHandler({
   middleware: cors(),
   router: appRouter,
   createContext: createContext as any,
 });
+const prefixedTRPCHandler = createPrefixedHandler('/api/trpc', tRPCHandler);
+
+const handleElysia = async (req: IncomingMessage, res: ServerResponse) => {
+  const request = await convertIMessToRequest(req);
+  const output = await ElysiaHandler.handle(request);
+  // If the response is 404, then passthrough request to tRPC's handler
+  if (output.status !== 404) {
+    res.writeHead(output.status, {
+      'Content-Type': output.headers.get('content-type') ?? 'application/json',
+    });
+    const contentType = output.headers.get('content-type') ?? 'application/json';
+    res.writeHead(output.status, { 'Content-Type': contentType });
+
+    if (contentType.startsWith('text/') || contentType === 'application/json') {
+      const data = await output.text();
+      res.write(data);
+    } else {
+      const data = await output.arrayBuffer();
+      res.write(Buffer.from(data));
+    }
+
+    res.end();
+    return true;
+  }
+  return false;
+};
 
 const server = createServer(async (req, res) => {
   try {
-    // Check if req is /user/get
-    if (req.url === '/user/credential' && req.method === 'POST') {
-      await handleGetUserByCredentials(req, res);
-      return;
-    }
-    if (req.url === '/user/email' && req.method === 'POST') {
-      await handleGetUserByEmail(req, res);
-      return;
+    /**
+     * Handle the request using Elysia
+     */
+    if (
+      req.url?.startsWith('/swagger') ||
+      req.url?.startsWith('/api/user') ||
+      req.url?.startsWith('/api/ext')
+    ) {
+      const handled = await handleElysia(req, res);
+      if (handled) {
+        return;
+      }
     }
   } catch (e) {
     console.error(e);
@@ -32,10 +71,9 @@ const server = createServer(async (req, res) => {
     res.end();
   }
   /**
-   * Handle the request however you like,
-   * just call the tRPC handler when you're ready
+   * Handle the request using tRPC
    */
-  handler(req, res);
+  prefixedTRPCHandler(req, res);
 });
 
 const wss = new WebSocketServer({ server });
@@ -43,6 +81,11 @@ const handlerWs = applyWSSHandler({
   wss,
   router: appRouter,
   createContext: createContext as any,
+  keepAlive: {
+    enabled: true,
+    pingMs: 30000,
+    pongWaitMs: 5000,
+  },
 });
 
 process.on('SIGTERM', () => {

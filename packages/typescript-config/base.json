@@ -4,8 +4,10 @@
     "declaration": true,
     "declarationMap": true,
     "esModuleInterop": true,
-    "incremental": false,
-    "isolatedModules": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "incremental": true,
+    "isolatedModules": true,
     "lib": ["es2022", "DOM", "DOM.Iterable"],
     "module": "NodeNext",
     "moduleDetection": "force",
@@ -15,5 +17,6 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ES2022"
-  }
+  },
+  "exclude": ["node_modules"]
 }

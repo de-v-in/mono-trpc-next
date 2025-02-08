@@ -12,7 +12,6 @@
   "dependencies": {
     "@repo/env": "*",
     "@repo/orm-entities": "*",
-    "@repo/ui": "*",
     "autoprefixer": "^10.4.20",
     "backend": "workspace:*",
     "next": "14.2.6",

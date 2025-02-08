@@ -8,9 +8,11 @@
     "fix-lint": "eslint --fix ."
   },
   "dependencies": {
+    "@elysiajs/swagger": "^1.2.0",
     "@repo/env": "*",
     "@repo/orm-entities": "*",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "elysia": "^1.2.10"
   },
   "devDependencies": {
     "@repo/eslint-config": "*",

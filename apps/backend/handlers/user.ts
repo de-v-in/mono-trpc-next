@@ -1,85 +1,110 @@
-import { MikroORMInstance } from '@backend/services/mikro-orm';
-import { BackendENV } from '@repo/env';
 import { User } from '@repo/orm-entities/user';
-import { IncomingMessage, ServerResponse } from 'http';
+import { BackendENV } from '@repo/env';
+import { MikroORMInstance } from '../services/mikro-orm';
+import Elysia, { t } from 'elysia';
 
 const mikro = MikroORMInstance.getInstance();
 
-export const handleGetUserByCredentials = async (
-  req: IncomingMessage,
-  res: ServerResponse<IncomingMessage> & {
-    req: IncomingMessage;
-  }
-) => {
-  const auth = req.headers.authorization;
-  if (!auth || auth !== `Bearer ${BackendENV.INTERNAL_SECRET}`) {
-    res.writeHead(401);
-    res.end();
-    return;
-  }
-
-  let body = '';
-  req.on('data', (chunk) => {
-    body += chunk.toString();
-  });
-  req.on('end', async () => {
-    try {
-      const { email, password } = JSON.parse(body);
-      // Check if email and password are correct
-      const em = await mikro.getEM();
-      const user = await em.findOne(User, {
-        email,
-        password: User.hashPassword(password),
-      });
-      if (!user) {
-        res.writeHead(401);
-        res.end();
-        return;
+export const UserPlugin = new Elysia({
+  prefix: '/api/user',
+  detail: {
+    tags: ['Auth'],
+    hide: true,
+  },
+})
+  .post(
+    '/credential',
+    async ({ body, headers, set }) => {
+      const auth = headers.authorization;
+      if (!auth || auth !== `Bearer ${BackendENV.INTERNAL_SECRET}`) {
+        set.status = 401;
+        return 'Unauthorized';
       }
-      // Return the user
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(user));
-    } catch (e) {
-      res.writeHead(500);
-      res.end();
-    }
-  });
-};
-
-export const handleGetUserByEmail = async (
-  req: IncomingMessage,
-  res: ServerResponse<IncomingMessage> & {
-    req: IncomingMessage;
-  }
-) => {
-  const auth = req.headers.authorization;
-  if (!auth || auth !== `Bearer ${BackendENV.INTERNAL_SECRET}`) {
-    res.writeHead(401);
-    res.end();
-    return;
-  }
-
-  let body = '';
-  req.on('data', (chunk) => {
-    body += chunk.toString();
-  });
-  req.on('end', async () => {
-    try {
-      const { email } = JSON.parse(body);
-      // Check if email and password are correct
+      const { email, password } = body;
       const em = await mikro.getEM();
-      const user = await em.fork().findOne(User, { email: email });
+      const user = await em.findOne(User, { email, password: User.hashPassword(password) });
       if (!user) {
-        res.writeHead(401);
-        res.end();
-        return;
+        set.status = 401;
+        return 'Unauthorized';
       }
-      // Return the user
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(user));
-    } catch (e) {
-      res.writeHead(500);
-      res.end();
+      return JSON.stringify(user);
+    },
+    {
+      headers: t.Object({
+        authorization: t.TemplateLiteral('Bearer ${string}', {
+          default: 'Bearer XXXX-XXXX-XXXX-XXXX',
+        }),
+      }),
+      body: t.Object({
+        email: t.String(),
+        password: t.String(),
+      }),
+      detail: {
+        responses: {
+          200: {
+            description: 'User details',
+            content: {
+              'application/json': {
+                schema: t.Object({
+                  id: t.String(),
+                  email: t.String(),
+                  avatar: t.Optional(t.String()),
+                }),
+              },
+            },
+          },
+          401: {
+            description: 'Unauthorized',
+          },
+        },
+      },
     }
-  });
-};
+  )
+  .post(
+    '/email',
+    async ({ headers, body, set }) => {
+      const auth = headers.authorization;
+      if (!auth || auth !== `Bearer ${BackendENV.INTERNAL_SECRET}`) {
+        set.status = 401;
+        return 'Unauthorized';
+      }
+
+      const { email } = body;
+      const em = await mikro.getEM();
+      const user = await em.fork().findOne(User, { email });
+      if (!user) {
+        set.status = 401;
+        return 'Unauthorized';
+      }
+      return JSON.stringify(user);
+    },
+    {
+      headers: t.Object({
+        authorization: t.TemplateLiteral('Bearer ${string}', {
+          default: 'Bearer XXXX-XXXX-XXXX-XXXX',
+        }),
+      }),
+      body: t.Object({
+        email: t.String(),
+      }),
+      detail: {
+        responses: {
+          200: {
+            description: 'User details',
+            content: {
+              'application/json': {
+                schema: t.Object({
+                  id: t.String(),
+                  email: t.String(),
+                  avatar: t.Optional(t.String()),
+                }),
+              },
+            },
+          },
+          401: {
+            description: 'Unauthorized',
+          },
+        },
+      },
+    }
+  );

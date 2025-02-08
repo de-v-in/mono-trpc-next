@@ -1,7 +1,6 @@
 'use client';
 
 import { trpc } from '@frontend/utils/trpc';
-import { Button } from '@repo/ui/button';
 import Image from 'next/image';
 
 import styles from './page.module.css';
@@ -49,9 +48,7 @@ export default function Home() {
             Read our docs
           </a>
         </div>
-        <Button appName="web" className={styles.secondary}>
-          Open alert
-        </Button>
+        <button className={styles.secondary}>Open alert</button>
       </main>
       <footer className={styles.footer}>
         <a

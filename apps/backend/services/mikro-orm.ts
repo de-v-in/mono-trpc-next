@@ -10,8 +10,8 @@ export class MikroORMInstance {
     this.logger = new Logger('MikroORMInstance');
     this.orm = MikroORM.init(dbConfig).then(async (orm) => {
       const generator = orm.getSchemaGenerator();
-      await generator.updateSchema().catch((e) => {
-        this.logger.i('init', 'Schema is updated', e);
+      await generator.updateSchema().catch(() => {
+        this.logger.i('init', 'Schema is updated');
       });
       this.logger.i('init', 'MikroORM initialized');
       return orm;

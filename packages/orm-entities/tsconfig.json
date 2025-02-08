@@ -1,11 +1,6 @@
 {
-  "extends": "@repo/typescript-config/base.json",
+  "extends": "@repo/typescript-config/trpc.json",
   "compilerOptions": {
-    "lib": ["esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
@@ -20,6 +15,5 @@
     "incremental": true,
     "target": "es2017"
   },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "include": ["**/*.ts"]
 }

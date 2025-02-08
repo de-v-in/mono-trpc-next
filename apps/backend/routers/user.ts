@@ -14,7 +14,7 @@ export const userRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const user = ctx.session.user!;
+      const user = ctx.session.user;
       if (input.password !== undefined && input.password.length >= 8)
         user.password = User.hashPassword(input.password);
       await ctx.em.persistAndFlush(user);

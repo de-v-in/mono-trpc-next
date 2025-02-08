@@ -1,42 +1,74 @@
-import { MikroORMInstance } from '@backend/services/mikro-orm';
 import { BackendENV } from '@repo/env';
 import { User } from '@repo/orm-entities/user';
 import { Logger } from '@saintno/needed-tools';
 import type { CreateNextContextOptions } from '@trpc/server/adapters/next';
 import { verify } from 'jsonwebtoken';
 
-const ContextLogger = new Logger('Context');
+import { MikroORMInstance } from './services/mikro-orm';
+
+const logger = new Logger('tRPC');
 
 /**
  * Creates context for an incoming request
- * @link https://trpc.io/docs/v11/context
+ * {@link https://trpc.io/docs/v11/context}
  */
 export const createContext = async (opts: CreateNextContextOptions) => {
+  const start = performance.now();
   const orm = await MikroORMInstance.getInstance().getORM();
-  const headers = opts.req.headers;
-  const rawAuthorization = headers['authorization'] ?? opts.info?.connectionParams?.Authorization;
-  const accessToken = rawAuthorization?.replace('Bearer ', '');
-
-  // Log user request to terminal
-  ContextLogger.i('createContext', opts.req.method || 'GET', opts.req.url);
-
   const em = orm.em.fork();
+
+  // Handle authorization
+  let user: User | null = null;
+  const headers = opts.req.headers;
+  const rawAuthorization = headers['authorization'] ?? opts.info.connectionParams?.Authorization;
+  const accessToken = rawAuthorization?.replace('Bearer', '').trim();
   try {
-    let user: User | null = null;
-    if (accessToken) {
-      const tokenInfo = verify(accessToken, BackendENV.NEXTAUTH_SECRET) as {
-        email: string;
-      };
+    if (accessToken && accessToken.length > 0) {
+      const tokenInfo = verify(accessToken, BackendENV.NEXTAUTH_SECRET) as { email: string };
       user = await em.findOne(User, { email: tokenInfo.email });
     }
-    return {
-      session: { user },
-      em,
-      headers,
-    };
   } catch (e) {
     throw new Error('Invalid access token');
   }
+
+  // Get user IP and user agent
+  const userIp = (headers['x-real-ip'] ||
+    headers['x-forwarded-for'] ||
+    opts.req.connection.remoteAddress) as string;
+  const userAgent = headers['user-agent'];
+
+  // Get current base URL
+  let baseUrl = BackendENV.BACKEND_URL;
+  if (!!opts.req.headers?.host) {
+    const httpProtocol: string =
+      opts.req.headers['x-forwarded-proto'] ||
+      opts.req.headers['x-forwarded-protocol'] ||
+      (opts.req as any).protocol ||
+      'http';
+    baseUrl = `${httpProtocol}://${opts.req.headers.host}`;
+  }
+
+  // Make the output to be passed to the context
+  const output = {
+    session: { user },
+    log: logger,
+    em,
+    headers,
+    baseUrl,
+    extra: {
+      userIp,
+      userAgent,
+    },
+  };
+
+  // Logging request
+  opts.res.on('finish', () => {
+    logger.i(opts.req.method || 'WS', user ? `User ${user.email} requested` : 'Processed request', {
+      queries: opts.info.calls.map((v) => v.path),
+      time: Math.round((performance.now() - start) / 1000) + 'ms',
+    });
+  });
+  return output;
 };
 
 export type Context = Awaited<ReturnType<typeof createContext>>;

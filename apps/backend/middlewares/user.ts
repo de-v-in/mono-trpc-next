@@ -5,9 +5,17 @@ import { middleware } from '../trpc';
 export const authChecker = middleware(({ next, ctx }) => {
   const user = ctx.session;
 
-  if (!user?.user) {
+  if (!user.user) {
     throw new TRPCError({ code: 'UNAUTHORIZED' });
   }
 
-  return next();
+  return next({
+    ctx: {
+      ...ctx,
+      session: {
+        ...ctx.session,
+        user: user.user,
+      },
+    },
+  });
 });
